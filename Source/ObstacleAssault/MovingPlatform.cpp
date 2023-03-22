@@ -16,6 +16,9 @@ void AMovingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 	StartLocation = GetActorLocation();
+	FString Name = GetName();
+
+	UE_LOG(LogTemp, Display, TEXT("Nombre del actor: %s"), *Name);
 }
 
 // Called every frame
@@ -23,26 +26,40 @@ void AMovingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//	Move the platform forwards
-	//	Get Current Location
-	FVector CurrentLocation = GetActorLocation();
-	//	Add to the Vector Location the distance we want to move the object
-	CurrentLocation += PlatformVel * DeltaTime;
-	//	Set a new location for the object
-	SetActorLocation(CurrentLocation);
+	MovePlatform(DeltaTime);
 
-//	Move backwards the object
-	//	Check the difference betwen initial and final distance
-	float distanceMoved = FVector::Dist(StartLocation, CurrentLocation);
-	//	Move the object on inverse direction
-	if(distanceMoved > MoveDistance)
+	RotatePlatform(DeltaTime);
+	
+}
+
+void AMovingPlatform::MovePlatform(float DeltaTime)
+{
+	if(ShouldPlatformReturn())
 	{
 		FVector NormalMoveDirection = PlatformVel.GetSafeNormal();
 		StartLocation = StartLocation + NormalMoveDirection * MoveDistance;
 		SetActorLocation(StartLocation);
 		PlatformVel = -PlatformVel;
 	}
+	else
+	{
+		FVector CurrentLocation = GetActorLocation();
+		CurrentLocation += PlatformVel * DeltaTime;
+		SetActorLocation(CurrentLocation);
+	}
 }
 
+void AMovingPlatform::RotatePlatform(float DeltaTime)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Hi Im Rotating"));
+}
 
+bool AMovingPlatform::ShouldPlatformReturn() const
+{
+	return GetDistanceMoved() > MoveDistance;
+}
 
+float AMovingPlatform::GetDistanceMoved() const
+{
+	return FVector::Dist(StartLocation, GetActorLocation());
+}
