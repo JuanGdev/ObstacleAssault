@@ -37,8 +37,10 @@ void AMovingPlatform::Tick(float DeltaTime)
 	//	Move the object on inverse direction
 	if(distanceMoved > MoveDistance)
 	{
+		FVector NormalMoveDirection = PlatformVel.GetSafeNormal();
+		StartLocation = StartLocation + NormalMoveDirection * MoveDistance;
+		SetActorLocation(StartLocation);
 		PlatformVel = -PlatformVel;
-		StartLocation = CurrentLocation;
 	}
 }
 
